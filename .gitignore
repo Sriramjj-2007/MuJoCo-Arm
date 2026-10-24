@@ -1,0 +1,36 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Editor and OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated MuJoCo/runtime artifacts
+MJDATA.TXT
+MUJOCO_LOG.TXT
+*.log
+*.pkl
+*.npy
+
+# Python cache and build output
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environment files
+.env
+.env.*
+
+# Large editor databases / local tooling artifacts
+*.db
+*.sqlite3
+*.db-shm
+*.db-wal
+*.lock

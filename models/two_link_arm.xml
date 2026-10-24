@@ -1,0 +1,60 @@
+<mujoco model="two_link_arm">
+    <option timestep="0.002" gravity="0 0 -9.81" />
+
+    <worldbody>
+        <light pos="0 0 3" />
+
+        <geom name="ground" type="plane"
+            size="2 2 0.1" rgba="0.8 0.8 0.8 1" />
+
+        <!-- Fixed base -->
+        <body name="base" pos="0 0 0.5">
+            <geom type="cylinder" size="0.12 0.08"
+                rgba="0.3 0.3 0.3 1" />
+
+            <!-- Link 1: 0.5 m -->
+            <body name="link1" pos="0 0 0.08">
+                <joint name="joint1" type="hinge"
+                    axis="0 1 0" range="-123 -35"
+                    limited="true" />
+
+                <inertial pos="0.25 0 0"
+                    mass="0.5"
+                    diaginertia="0.001 0.012 0.012" />
+
+                <geom type="capsule"
+                    fromto="0 0 0 0.5 0 0"
+                    size="0.04" rgba="0.1 0.5 1 1" />
+
+                <!-- Link 2: 0.4 m -->
+                <body name="link2" pos="0.5 0 0">
+                    <joint name="joint2" type="hinge"
+                        axis="0 1 0" range="-150 150"
+                        limited="true" />
+
+                    <inertial pos="0.2 0 0"
+                        mass="0.3"
+                        diaginertia="0.0005 0.005 0.005" />
+
+                    <geom type="capsule"
+                        fromto="0 0 0 0.4 0 0"
+                        size="0.035" rgba="1 0.5 0.1 1" />
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <actuator>
+        <!-- Base/shoulder servo -->
+        <position name="servo1"
+            joint="joint1"
+            kp="20"
+            ctrlrange="-2.14675 -0.610865" />
+
+        <!-- Elbow servo -->
+        <position name="servo2"
+            joint="joint2"
+            kp="20"
+            ctrlrange="0.44 2.01" />
+    </actuator>
+
+</mujoco>
