@@ -1,60 +1,137 @@
-<mujoco model="two_link_arm">
-    <option timestep="0.002" gravity="0 0 -9.81" />
+
+<mujoco model="three_dof_arm">
+
+    <compiler angle="degree" autolimits="true"/>
+
+    <option timestep="0.002"
+            gravity="0 0 -9.81"
+            integrator="implicitfast"
+            solver="Newton"
+            iterations="100"
+            tolerance="1e-8"/>
+
+    <default>
+        <joint armature="0.02"
+               damping="0.5"
+               frictionloss="0.05"/>
+
+        <geom condim="3"
+              friction="0.8 0.1 0.1"
+              density="800"/>
+    </default>
 
     <worldbody>
-        <light pos="0 0 3" />
 
-        <geom name="ground" type="plane"
-            size="2 2 0.1" rgba="0.8 0.8 0.8 1" />
+        <light pos="0 0 3"/>
 
-        <!-- Fixed base -->
+        <geom name="ground"
+              type="plane"
+              size="2 2 0.1"
+              rgba="0.8 0.8 0.8 1"/>
+
+        <!-- Rotating base -->
         <body name="base" pos="0 0 0.5">
-            <geom type="cylinder" size="0.12 0.08"
-                rgba="0.3 0.3 0.3 1" />
 
-            <!-- Link 1: 0.5 m -->
+            <joint name="base_rotation"
+                   type="hinge"
+                   axis="0 0 1"
+                   range="-45 45"
+                   damping="2.0"
+                   armature="0.08"
+                   frictionloss="0.1"/>
+
+            <!-- Base rotational inertia -->
+            <inertial pos="0 0 0"
+                      mass="1.5"
+                      diaginertia="0.025 0.025 0.04"/>
+
+            <geom name="base_cylinder"
+                  type="cylinder"
+                  size="0.12 0.08"
+                  mass="1.0"
+                  rgba="0.3 0.3 0.3 1"/>
+
+            <!-- Shoulder and first link -->
             <body name="link1" pos="0 0 0.08">
-                <joint name="joint1" type="hinge"
-                    axis="0 1 0" range="-123 -35"
-                    limited="true" />
+
+                <joint name="joint1"
+                       type="hinge"
+                       axis="0 1 0"
+                       range="-123 -35"
+                       damping="0.8"
+                       armature="0.03"
+                       frictionloss="0.05"/>
 
                 <inertial pos="0.25 0 0"
-                    mass="0.5"
-                    diaginertia="0.001 0.012 0.012" />
+                          mass="0.5"
+                          diaginertia="0.001 0.012 0.012"/>
 
-                <geom type="capsule"
-                    fromto="0 0 0 0.5 0 0"
-                    size="0.04" rgba="0.1 0.5 1 1" />
+                <geom name="upper_arm"
+                      type="capsule"
+                      fromto="0 0 0 0.5 0 0"
+                      size="0.04"
+                      mass="0.5"
+                      rgba="0.1 0.5 1 1"/>
 
-                <!-- Link 2: 0.4 m -->
+                <!-- Elbow and second link -->
                 <body name="link2" pos="0.5 0 0">
-                    <joint name="joint2" type="hinge"
-                        axis="0 1 0" range="-150 150"
-                        limited="true" />
+
+                    <joint name="joint2"
+                           type="hinge"
+                           axis="0 1 0"
+                           range="25 116"
+                           damping="0.5"
+                           armature="0.02"
+                           frictionloss="0.03"/>
 
                     <inertial pos="0.2 0 0"
-                        mass="0.3"
-                        diaginertia="0.0005 0.005 0.005" />
+                              mass="0.3"
+                              diaginertia="0.0005 0.005 0.005"/>
 
-                    <geom type="capsule"
-                        fromto="0 0 0 0.4 0 0"
-                        size="0.035" rgba="1 0.5 0.1 1" />
+                    <geom name="forearm"
+                          type="capsule"
+                          fromto="0 0 0 0.4 0 0"
+                          size="0.035"
+                          mass="0.3"
+                          rgba="1 0.5 0.1 1"/>
+
+                    <!-- End-effector marker -->
+                    <site name="end_effector"
+                          pos="0.4 0 0"
+                          size="0.025"
+                          rgba="1 0 0 1"/>
+
                 </body>
             </body>
         </body>
     </worldbody>
-    <actuator>
-        <!-- Base/shoulder servo -->
-        <position name="servo1"
-            joint="joint1"
-            kp="20"
-            ctrlrange="-2.14675 -0.610865" />
 
-        <!-- Elbow servo -->
-        <position name="servo2"
-            joint="joint2"
-            kp="20"
-            ctrlrange="0.44 2.01" />
+    <actuator>
+
+        <!-- Base: lower gain, stronger velocity damping -->
+        <position name="base_servo"
+                  joint="base_rotation"
+                  kp="8"
+                  kv="3"
+                  ctrlrange="-0.785398 0.785398"
+                  forcerange="-8 8"/>
+
+        <!-- Shoulder -->
+        <position name="shoulder_servo"
+                  joint="joint1"
+                  kp="20"
+                  kv="2"
+                  ctrlrange="-2.146755 -0.610865"
+                  forcerange="-20 20"/>
+
+        <!-- Elbow -->
+        <position name="elbow_servo"
+                  joint="joint2"
+                  kp="15"
+                  kv="1.5"
+                  ctrlrange="0.436332 2.024582"
+                  forcerange="-12 12"/>
+
     </actuator>
 
 </mujoco>
